@@ -13,12 +13,18 @@ import GoalInput from "./components/GoalInput";
 
 export default function App() {
   const [CourseGoals, setCourseGoals] = useState([]);
+  const [isAddMode, setIsAddMode] = useState(false);
 
   const addGoalHandler = goalTitle => {
     setCourseGoals(currentGoals => [
       ...currentGoals,
       { id: Math.random().toString(), value: goalTitle }
     ]);
+    setIsAddMode(false);
+  };
+
+  const goBack = () => {
+    setIsAddMode(false);
   };
 
   //wenn wir  id={itemData.item.id} bei GoalItem wegnehmen ist goalId undefined
@@ -32,7 +38,15 @@ export default function App() {
 
   return (
     <View style={styles.screen}>
-      <GoalInput onAddGoal={addGoalHandler} />
+      <Button
+        title="add new Papas Geburtstag Nachricht"
+        onPress={() => setIsAddMode(true)}
+      />
+      <GoalInput
+        ongoBack={goBack}
+        visible_Mua={isAddMode}
+        onAddGoal={addGoalHandler}
+      />
 
       <FlatList
         keyExtractor={(item, index) => item.id}
