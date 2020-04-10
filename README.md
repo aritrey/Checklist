@@ -3,8 +3,7 @@
 ### Das erste Mal meine Git Repositorys benutzen
 #### (alles was *rekursiv* geschrieben ist muss in einem Terminal (bei windows z.B. Powershell eingegeben werden)
 
-1)	downloade die files von git hub auf den PC 
-  - (HILFE: ich empfehle dir GitHub Desktop. Das ist sehr übersichtlich. https://desktop.github.com/)
+1)	downloade die files von git hub auf den PC (Hier ein tutorial, das das erklärt:https://www.youtube.com/watch?v=Jge57UHvYto)
 
 
 
@@ -53,11 +52,13 @@ navigiere mit dem cd-Befehl (cd [Path]) in den Ordner, deren Dateien du sehen wi
 1) **im Terminal** (z.B. Powershell): navigiere mit dem cd-Befehl (cd [Path]) in den Ordner, deren Dateien du sehen willst (z.B. Guess_a_number)  
 - (z.B. *cd C:\Users\jona\Documents\SiB_secret in a bottle\projekte\Guess_a_number* , enter drücken )
 
-2) **im Terminal** (z.B. Powershell): *npm start* eingeben; enter drücken
+2) **im Terminal** (z.B. Powershell): *git pull* eingeben; enter drücken 
 
-3) es öffnet sich ein Tab im Browser: scanne den Barcode mit deinem Handy (der Expo App)
+3) **im Terminal** (z.B. Powershell): *npm start* eingeben; enter drücken
 
-4) Geschafft! die App läd
+4) es öffnet sich ein Tab im Browser: scanne den Barcode mit deinem Handy (der Expo App)
+
+5) Geschafft! die App läd
 
 -> nachdem du fertig bist einfach alles wieder schließen
 
