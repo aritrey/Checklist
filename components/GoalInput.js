@@ -1,11 +1,11 @@
 import { View, TextInput, Text, Button, StyleSheet, Modal } from "react-native";
 import React, { useState } from "react";
 
-const GoalItem = props => {
+const GoalItem = (props) => {
   const [enteredGoal, setEnteredGoal] = useState("");
   const [errorMsg, seterrorMsg] = useState("");
 
-  const goalInputHandler = text => {
+  const goalInputHandler = (text) => {
     setEnteredGoal(text);
     seterrorMsg("");
   };
@@ -15,7 +15,7 @@ const GoalItem = props => {
       props.onAddGoal(enteredGoal);
       setEnteredGoal("");
     }
-    seterrorMsg("Please write a Papa-Geburtstag-Nachricht!");
+    seterrorMsg("Please add a text to your new goal first!");
   };
 
   return (
@@ -23,7 +23,7 @@ const GoalItem = props => {
       <View style={styles.inputContainer}>
         <Text color="red">{errorMsg}</Text>
         <TextInput
-          placeholder="Party, Party!"
+          placeholder="Whats your new Goal?"
           style={styles.input}
           onChangeText={goalInputHandler}
           value={enteredGoal}
@@ -48,22 +48,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: "black",
     borderWidth: 1,
-    padding: 10
+    padding: 10,
   },
   inputContainer: {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    flex: 1
+    flex: 1,
   },
   buttons: {
     width: "60%",
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   but: {
-    width: "45%"
-  }
+    width: "45%",
+  },
 });
 
 export default GoalItem;

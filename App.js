@@ -1,73 +1,77 @@
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Button,
-  FlatList
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View, Button, FlatList } from "react-native";
+import { useSelector, useDispatch, Provider } from "react-redux";
+import { createStore, applyMiddleware } from "redux";
+import ReduxThunk from "redux-thunk";
 
 import GoalItem from "./components/GoalItem";
 import GoalInput from "./components/GoalInput";
+import * as goalActions from "./store/actions/goals";
+import goalReducer from "./store/reducers/goals";
+import { init } from "./helpers/database";
 
-export default function App() {
-  const [CourseGoals, setCourseGoals] = useState([]);
-  const [isAddMode, setIsAddMode] = useState(false);
+init()
+  .then(() => {
+    console.log("initialized database");
+  })
+  .catch((err) => {
+    console.log("initializing database failed");
+    console.log(err);
+  });
 
-  const addGoalHandler = goalTitle => {
-    setCourseGoals(currentGoals => [
-      ...currentGoals,
-      { id: Math.random().toString(), value: goalTitle }
-    ]);
-    setIsAddMode(false);
-  };
+const store = createStore(goalReducer, applyMiddleware(ReduxThunk));
 
-  const goBack = () => {
-    setIsAddMode(false);
-  };
-
-  //wenn wir  id={itemData.item.id} bei GoalItem wegnehmen ist goalId undefined
-  //woher weiß die function, dass es mit Id vergleichen muss?
-  //vergl. automatisch gleiche pros (id mit id von goalitem)
-  const removeGoalHandler = goalId => {
-    setCourseGoals(currentGoals => {
-      return currentGoals.filter(goal => goal.id !== goalId);
-    });
-  };
-
+export default function AppWrapper() {
   return (
-    <View style={styles.screen}>
-      <Button
-        title="add new Papas Geburtstag Nachricht"
-        onPress={() => setIsAddMode(true)}
-      />
-      <GoalInput
-        ongoBack={goBack}
-        visible_Mua={isAddMode}
-        onAddGoal={addGoalHandler}
-      />
-
-      <FlatList
-        keyExtractor={(item, index) => item.id}
-        // wenn item key als attribut hat wird das genommen und kein key extractor gebraucht
-        data={CourseGoals}
-        renderItem={itemData => (
-          <GoalItem
-            // ALTERNATIV: id fuer onDelete: onDelete={removeGoalHandler.bind(this,itemData.item.id)}
-            id={itemData.item.id}
-            onDelete={removeGoalHandler}
-            title={itemData.item.value}
-          />
-        )}
-      />
-    </View>
+    <Provider store={store}>
+      <App />
+    </Provider>
   );
 }
 
+const App = (props) => {
+  const goals = useSelector((state) => {
+    return state.goals;
+  });
+  const [isAddMode, setIsAddMode] = useState(false);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(goalActions.loadGoals());
+  }, [dispatch]);
+
+  return (
+    <View style={styles.screen}>
+      <Button title="add new goal" onPress={() => setIsAddMode(true)} />
+      <GoalInput
+        ongoBack={() => setIsAddMode(false)}
+        visible_Mua={isAddMode}
+        onAddGoal={(enteredGoal) => dispatch(goalActions.addGoal(enteredGoal))}
+      />
+      <FlatList
+        keyExtractor={(item) => item.id}
+        data={goals}
+        renderItem={(itemData) => {
+          return (
+            <GoalItem
+              id={itemData.item.id}
+              onDelete={(id) => {
+                dispatch(goalActions.deleteGoal(id));
+              }}
+              title={itemData.item.title}
+            />
+          );
+        }}
+      />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   screen: {
+    // alignItems: "center",
     padding: 50,
-    flexDirection: "column"
-  }
+    flexDirection: "column",
+  },
 });
