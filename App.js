@@ -1,73 +1,81 @@
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Button,
-  FlatList
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View, Button, FlatList } from "react-native";
+import { useSelector, useDispatch, Provider } from "react-redux";
+import { createStore, applyMiddleware } from "redux";
+import ReduxThunk from "redux-thunk";
 
-import GoalItem from "./components/GoalItem";
-import GoalInput from "./components/GoalInput";
+import TodoItem from "./components/TodoItem";
+import TodoInput from "./components/TodoInput";
+import * as todoActions from "./store/actions/todo";
+import todoReducer from "./store/reducers/todo";
+import { init } from "./helpers/database";
 
-export default function App() {
-  const [CourseGoals, setCourseGoals] = useState([]);
-  const [isAddMode, setIsAddMode] = useState(false);
+init()
+  .then(() => {
+    console.log("database initialized");
+  })
+  .catch((err) => {
+    console.log("initializing database failed");
+    console.log(err);
+  });
 
-  const addGoalHandler = goalTitle => {
-    setCourseGoals(currentGoals => [
-      ...currentGoals,
-      { id: Math.random().toString(), value: goalTitle }
-    ]);
-    setIsAddMode(false);
-  };
+const store = createStore(todoReducer, applyMiddleware(ReduxThunk));
 
-  const goBack = () => {
-    setIsAddMode(false);
-  };
-
-  //wenn wir  id={itemData.item.id} bei GoalItem wegnehmen ist goalId undefined
-  //woher weiß die function, dass es mit Id vergleichen muss?
-  //vergl. automatisch gleiche pros (id mit id von goalitem)
-  const removeGoalHandler = goalId => {
-    setCourseGoals(currentGoals => {
-      return currentGoals.filter(goal => goal.id !== goalId);
-    });
-  };
-
+export default function AppWrapper() {
   return (
-    <View style={styles.screen}>
-      <Button
-        title="add new Papas Geburtstag Nachricht"
-        onPress={() => setIsAddMode(true)}
-      />
-      <GoalInput
-        ongoBack={goBack}
-        visible_Mua={isAddMode}
-        onAddGoal={addGoalHandler}
-      />
-
-      <FlatList
-        keyExtractor={(item, index) => item.id}
-        // wenn item key als attribut hat wird das genommen und kein key extractor gebraucht
-        data={CourseGoals}
-        renderItem={itemData => (
-          <GoalItem
-            // ALTERNATIV: id fuer onDelete: onDelete={removeGoalHandler.bind(this,itemData.item.id)}
-            id={itemData.item.id}
-            onDelete={removeGoalHandler}
-            title={itemData.item.value}
-          />
-        )}
-      />
-    </View>
+    <Provider store={store}>
+      <App />
+    </Provider>
   );
 }
 
+const App = (props) => {
+  const todos = useSelector((state) => state.todos);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(todoActions.loadTodos());
+  }, [dispatch]);
+
+  return (
+    <View style={styles.screen}>
+      <View style={styles.button}>
+        <Button
+          title="add new Todo"
+          color="#4ea8de"
+          onPress={() => setIsEditMode(true)}
+        />
+      </View>
+      <TodoInput
+        isVisible={isEditMode}
+        ongoBack={() => setIsEditMode(false)}
+        onAddTodo={(enteredTodo) => dispatch(todoActions.addTodo(enteredTodo))}
+      />
+      <FlatList
+        keyExtractor={(item) => item.id.toString()}
+        data={todos}
+        renderItem={(itemData) => {
+          return (
+            <TodoItem
+              id={itemData.item.id}
+              onDelete={(id) => {
+                dispatch(todoActions.deleteTodo(id));
+              }}
+              title={itemData.item.title}
+            />
+          );
+        }}
+      />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   screen: {
-    padding: 50,
-    flexDirection: "column"
-  }
+    flex: 1,
+    padding: "12%",
+  },
+  button: { paddingBottom: "8%" },
 });
