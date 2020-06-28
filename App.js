@@ -4,22 +4,22 @@ import { useSelector, useDispatch, Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import ReduxThunk from "redux-thunk";
 
-import GoalItem from "./components/GoalItem";
-import GoalInput from "./components/GoalInput";
-import * as goalActions from "./store/actions/goals";
-import goalReducer from "./store/reducers/goals";
+import TodoItem from "./components/TodoItem";
+import TodoInput from "./components/TodoInput";
+import * as todoActions from "./store/actions/todo";
+import todoReducer from "./store/reducers/todo";
 import { init } from "./helpers/database";
 
 init()
   .then(() => {
-    console.log("initialized database");
+    console.log("database initialized");
   })
   .catch((err) => {
     console.log("initializing database failed");
     console.log(err);
   });
 
-const store = createStore(goalReducer, applyMiddleware(ReduxThunk));
+const store = createStore(todoReducer, applyMiddleware(ReduxThunk));
 
 export default function AppWrapper() {
   return (
@@ -30,34 +30,38 @@ export default function AppWrapper() {
 }
 
 const App = (props) => {
-  const goals = useSelector((state) => {
-    return state.goals;
-  });
-  const [isAddMode, setIsAddMode] = useState(false);
+  const todos = useSelector((state) => state.todos);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(goalActions.loadGoals());
+    dispatch(todoActions.loadTodos());
   }, [dispatch]);
 
   return (
     <View style={styles.screen}>
-      <Button title="add new goal" onPress={() => setIsAddMode(true)} />
-      <GoalInput
-        ongoBack={() => setIsAddMode(false)}
-        visible_Mua={isAddMode}
-        onAddGoal={(enteredGoal) => dispatch(goalActions.addGoal(enteredGoal))}
+      <View style={styles.button}>
+        <Button
+          title="add new Todo"
+          color="#4ea8de"
+          onPress={() => setIsEditMode(true)}
+        />
+      </View>
+      <TodoInput
+        isVisible={isEditMode}
+        ongoBack={() => setIsEditMode(false)}
+        onAddTodo={(enteredTodo) => dispatch(todoActions.addTodo(enteredTodo))}
       />
       <FlatList
-        keyExtractor={(item) => item.id}
-        data={goals}
+        keyExtractor={(item) => item.id.toString()}
+        data={todos}
         renderItem={(itemData) => {
           return (
-            <GoalItem
+            <TodoItem
               id={itemData.item.id}
               onDelete={(id) => {
-                dispatch(goalActions.deleteGoal(id));
+                dispatch(todoActions.deleteTodo(id));
               }}
               title={itemData.item.title}
             />
@@ -70,8 +74,8 @@ const App = (props) => {
 
 const styles = StyleSheet.create({
   screen: {
-    // alignItems: "center",
-    padding: 50,
-    flexDirection: "column",
+    flex: 1,
+    padding: "12%",
   },
+  button: { paddingBottom: "8%" },
 });

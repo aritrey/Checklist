@@ -3,14 +3,12 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TouchableHighlight,
   Animated,
-  Button,
 } from "react-native";
 import React, { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const GoalItem = (props) => {
+const TodoItem = (props) => {
   const animation = useState(new Animated.Value(0))[0];
   const [selected, setSelected] = useState(false);
 
@@ -38,14 +36,11 @@ const GoalItem = (props) => {
 
   return (
     <Animated.View style={[styles.listItem, animatedStyle]}>
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={props.onDelete.bind(this, props.id)}
-      >
-        <MaterialCommunityIcons name="delete" size={24} color="black" />
+      <TouchableOpacity onPress={props.onDelete.bind(this, props.id)}>
+        <MaterialCommunityIcons name="delete" size={25} color="black" />
       </TouchableOpacity>
-      <View style={{ flex: 1, alignItems: "center" }}>
-        <Text style={{ textAlign: "center" }}>{props.title}</Text>
+      <View style={styles.text}>
+        <Text>{props.title}</Text>
       </View>
 
       <TouchableOpacity onPress={toggleSelected}>
@@ -62,14 +57,14 @@ const styles = StyleSheet.create({
   listItem: {
     alignSelf: "center",
     padding: 10,
-    marginTop: 10,
-    backgroundColor: "#ccc",
+    marginVertical: "2%",
     borderColor: "black",
     borderWidth: 1,
     borderRadius: 5,
     flexDirection: "row",
     alignItems: "center",
   },
+  text: { flex: 1, alignItems: "center" },
 });
 
-export default GoalItem;
+export default TodoItem;

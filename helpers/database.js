@@ -1,12 +1,12 @@
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabase("myGoals.db");
+const db = SQLite.openDatabase("myChecklist.db");
 
 export const init = () => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS goals (id INTEGER PRIMARY KEY NOT NULL, title TEXT NOT NULL)",
+        "CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY NOT NULL, title TEXT NOT NULL, done BIT NOT NULL)",
         [],
         () => {
           resolve();
@@ -20,12 +20,12 @@ export const init = () => {
   return promise;
 };
 
-export const insertGoal = (title) => {
+export const insertTodo = (title) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "INSERT INTO goals (title) VALUES (?)",
-        [title],
+        "INSERT INTO todos (title,done) VALUES (?,?)",
+        [title, 0],
         (_, result) => {
           resolve(result);
         },
@@ -38,11 +38,11 @@ export const insertGoal = (title) => {
   return promise;
 };
 
-export const fetchGoals = () => {
+export const fetchTodos = () => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT * FROM goals",
+        "SELECT * FROM todos",
         [],
         (_, result) => {
           resolve(result);
@@ -56,11 +56,30 @@ export const fetchGoals = () => {
   return promise;
 };
 
-export const deleteGoalDB = (id) => {
+//for the case i want to save the done state later on as well
+// export const toggleDone = (id, done) => {
+//   const promise = new Promise((resolve, reject) => {
+//     db.transaction((tx) => {
+//       tx.executeSql(
+//         "UPDATE todos SET done=? where id=?",
+//         [1+done, id],
+//         (_, result) => {
+//           resolve(result);
+//         },
+//         (_, err) => {
+//           reject(err);
+//         }
+//       );
+//     });
+//   });
+//   return promise;
+// };
+
+export const deleteTodoDB = (id) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "DELETE FROM goals WHERE id=?",
+        "DELETE FROM todos WHERE id=?",
         [id],
         (_, result) => {
           resolve(result);

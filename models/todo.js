@@ -1,8 +1,8 @@
-class Goal {
+class Todo {
   constructor(id, title) {
     this.id = id;
     this.title = title;
   }
 }
 
-export default Goal;
+export default Todo;
